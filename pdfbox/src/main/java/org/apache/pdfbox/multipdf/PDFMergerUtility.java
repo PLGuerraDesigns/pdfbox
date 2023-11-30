@@ -661,11 +661,41 @@ public class PDFMergerUtility {
             cloner.cloneMerge(srcOCP, destOCP);
         }
     }
+    private int[] getTreeKeyAndMerge(PDStructureTreeRoot[] structTrees, List<Map<Integer, COSObjectable>> numberTreeMaps) throws IOException
+    {
 
     private int getParentTreeNextKey(PDStructureTreeRoot[] structTrees,
             List<Map<Integer, COSObjectable>> numberTreeMaps) throws IOException {
         int destParentTreeNextKey = -1;
+        int shouldMerge=0;
+        int[] out={destParentTreeNextKey,shouldMerge};
         PDNumberTreeNode destParentTree = structTrees[0].getParentTree();
+            destParentTreeNextKey = structTrees[0].getParentTreeNextKey();
+            if (destParentTree != null)
+            {
+                numberTreeMaps.set(0,getNumberTreeAsMap(destParentTree));
+                if (destParentTreeNextKey < 0)
+                {
+                    destParentTreeNextKey = 0;
+                    if (!numberTreeMaps.get(0).isEmpty())
+                    {
+                        destParentTreeNextKey = Collections.max(numberTreeMaps.get(0).keySet()) + 1;
+                    }
+                }
+                if (destParentTreeNextKey >= 0 && structTrees[1] != null)
+                {
+                    PDNumberTreeNode srcParentTree = structTrees[1].getParentTree();
+                    if (srcParentTree != null)
+                    {
+                        numberTreeMaps.set(1,getNumberTreeAsMap(srcParentTree));
+                        shouldMerge = 1;
+                        
+                    }
+                }
+            }
+        out[0]=destParentTreeNextKey;
+        out[1]=shouldMerge;
+        return out;
         destParentTreeNextKey = structTrees[0].getParentTreeNextKey();
         if (destParentTree != null) {
             numberTreeMaps.set(0, getNumberTreeAsMap(destParentTree));
@@ -777,6 +807,8 @@ public class PDFMergerUtility {
         cats[0] = destination.getDocumentCatalog();
         cats[1] = source.getDocumentCatalog();
         int pageIndexOpenActionDest = getCatalogs(cats);
+        
+        
 
         PDFCloneUtility cloner = cloneSetup(destination, cats);
 
@@ -809,6 +841,14 @@ public class PDFMergerUtility {
                 }
             }
         }
+        if (structTrees[0] != null)
+        {
+            int[] treekeymerge=getTreeKeyAndMerge(structTrees,numberTreeMaps);
+            destParentTreeNextKey=treekeymerge[0];
+            if (treekeymerge[1] == 1 && !numberTreeMaps.get(1).isEmpty()) {
+                mergeStructTree = true;
+            }
+          
         if (structTrees[0] != null) {
             destParentTreeNextKey = getParentTreeNextKey(structTrees, numberTreeMaps);
 
