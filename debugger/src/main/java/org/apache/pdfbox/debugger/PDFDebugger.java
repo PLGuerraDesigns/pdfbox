@@ -723,29 +723,6 @@ public class PDFDebugger extends JFrame implements Callable<Integer>, HyperlinkL
         return findPreviousMenuItem;
     }
 
-    /**
-     * This method is called via reflection on Mac OS X.
-     */
-    private void osxOpenFiles(String filename)
-    {
-        try
-        {
-            readPDFFile(filename, "");
-        }
-        catch (IOException | URISyntaxException e)
-        {
-            new ErrorDialog(e).setVisible(true);
-        }
-    }
-
-    /**
-     * This method is called via reflection on Mac OS X.
-     */
-    private void osxQuit()
-    {
-        exitMenuItemActionPerformed(null);
-    }
-
     private void saveAsMenuItemActionPerformed(ActionEvent evt)
     {
         try
@@ -1189,7 +1166,6 @@ public class PDFDebugger extends JFrame implements Callable<Integer>, HyperlinkL
 
     private String convertToString( Object selectedNode )
     {
-        String data = null;
         if(selectedNode instanceof COSBoolean)
         {
             return "" + ((COSBoolean) selectedNode).getValue();
