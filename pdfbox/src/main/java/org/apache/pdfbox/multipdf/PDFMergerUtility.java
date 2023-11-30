@@ -664,8 +664,6 @@ public class PDFMergerUtility {
     private int[] getTreeKeyAndMerge(PDStructureTreeRoot[] structTrees, List<Map<Integer, COSObjectable>> numberTreeMaps) throws IOException
     {
 
-    private int getParentTreeNextKey(PDStructureTreeRoot[] structTrees,
-            List<Map<Integer, COSObjectable>> numberTreeMaps) throws IOException {
         int destParentTreeNextKey = -1;
         int shouldMerge=0;
         int[] out={destParentTreeNextKey,shouldMerge};
@@ -696,24 +694,7 @@ public class PDFMergerUtility {
         out[0]=destParentTreeNextKey;
         out[1]=shouldMerge;
         return out;
-        destParentTreeNextKey = structTrees[0].getParentTreeNextKey();
-        if (destParentTree != null) {
-            numberTreeMaps.set(0, getNumberTreeAsMap(destParentTree));
-            if (destParentTreeNextKey < 0) {
-                destParentTreeNextKey = 0;
-                if (!numberTreeMaps.get(0).isEmpty()) {
-                    destParentTreeNextKey = Collections.max(numberTreeMaps.get(0).keySet()) + 1;
-                }
-            }
-            if (destParentTreeNextKey >= 0 && structTrees[1] != null) {
-                PDNumberTreeNode srcParentTree = structTrees[1].getParentTree();
-                if (srcParentTree != null) {
-                    numberTreeMaps.set(1, getNumberTreeAsMap(srcParentTree));
 
-                }
-            }
-        }
-        return destParentTreeNextKey;
     }
 
     private PDPage createNewPage(PDPage page, PDFCloneUtility cloner, boolean mergeStructTree) throws IOException {
@@ -848,13 +829,9 @@ public class PDFMergerUtility {
             if (treekeymerge[1] == 1 && !numberTreeMaps.get(1).isEmpty()) {
                 mergeStructTree = true;
             }
-          
-        if (structTrees[0] != null) {
-            destParentTreeNextKey = getParentTreeNextKey(structTrees, numberTreeMaps);
-
-            mergeStructTree = (!numberTreeMaps.get(1).isEmpty());
-
         }
+          
+
         Map<COSDictionary, COSDictionary> objMapping = getObjMapping(destination, cats, cloner, mergeStructTree,
                 pageIndexOpenActionDest, destParentTreeNextKey);
         if (mergeStructTree) {
